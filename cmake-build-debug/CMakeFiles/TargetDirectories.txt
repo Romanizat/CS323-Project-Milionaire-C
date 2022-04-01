@@ -1,0 +1,3 @@
+C:/Users/Marko/CLionProjects/cs323/CS323-Projekat-MarkoJosifovic4494/cmake-build-debug/CMakeFiles/CS323_Projekat_MarkoJosifovic4494.dir
+C:/Users/Marko/CLionProjects/cs323/CS323-Projekat-MarkoJosifovic4494/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Marko/CLionProjects/cs323/CS323-Projekat-MarkoJosifovic4494/cmake-build-debug/CMakeFiles/rebuild_cache.dir
