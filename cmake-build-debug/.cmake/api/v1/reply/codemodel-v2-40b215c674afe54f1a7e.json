@@ -49,8 +49,8 @@
 	"kind" : "codemodel",
 	"paths" : 
 	{
-		"build" : "C:/Users/Marko/CLionProjects/cs323/CS323-Projekat-MarkoJosifovic4494/cmake-build-debug",
-		"source" : "C:/Users/Marko/CLionProjects/cs323/CS323-Projekat-MarkoJosifovic4494"
+		"build" : "C:/Git repos/CS323-Project-Milionaire-C/cmake-build-debug",
+		"source" : "C:/Git repos/CS323-Project-Milionaire-C"
 	},
 	"version" : 
 	{

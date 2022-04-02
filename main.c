@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <string.h>
+#include <malloc.h>
 
 /**
  * CS323 Projekat - Konzolna aplikacija Milioner - Marko Josifovic 4494
@@ -32,12 +33,27 @@ void getUserByUsername(char *username[], Player *player) {
     //TODO
 }
 
-void getAllQuestions(Question *question[]){
+void getAllQuestions(Question *question[]) {
     //TODO
 }
 
-Question[] getAllQuestionsForLevel(Question *question[], int level){
-    
+Question *getAllQuestionsForLevel(Question *question[], int arraySize, int level, int *newSize) {
+    Question *questionsForLevel;
+    int i = 0, count = 0;
+    for (i; i < arraySize; ++i) {
+        if (question[i]->level == level) {
+            count++;
+        }
+    }
+    questionsForLevel = (Question *) malloc(count * sizeof(Question));
+    int j=0;
+    for (i = 0; i < arraySize; ++i) {
+        if(question[i]->level==level){
+            questionsForLevel[j] = *question[i];
+        }
+    }
+    *newSize = j;
+    return questionsForLevel;
 }
 
 int main() {
@@ -52,15 +68,17 @@ int main() {
         printf("Please enter the username you will be using:\n");
         scanf("%s", &username);
         strcpy(player.username, username);
-        printf("Welcome %s!\n",&player.username);
+        //TODO: boolean method to check if username already exists
+        printf("Welcome %s!\n", &player.username);
     } else if (newPlayer == 'N' || newPlayer == 'n') {
         printf("Welcome back!\n");
         printf("Please enter your username:\n");
         scanf("%s", &username);
-//        TODO: get user from file and tell user of his previous score
+        //TODO: get user from file and tell user of his previous score
     } else {
         printf("Unknown command\n Please try again...");
         return -1;
     }
+
     return 0;
 }
