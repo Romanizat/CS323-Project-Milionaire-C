@@ -33,30 +33,92 @@ void getUserByUsername(char *username[], Player *player) {
     //TODO
 }
 
-void getAllQuestions(Question *question[]) {
-    //TODO
+Question *getAllQuestions(int *newSize) {
+    FILE *f = fopen("questions.txt", "r");
+
+    int questionCount;
+
+    fscanf_s(f, "%d", &questionCount);
+    *newSize = questionCount;
+    Question *questionList;
+    questionList = (Question *) malloc(questionCount * sizeof(Question));
+    int maxCount = 500;
+
+    for (int i = 0; i < questionCount; i++) {
+        Question question;
+        fgets(question.questionText, maxCount, f);
+        fgets(question.correctAnswer, maxCount, f);
+        fgets(question.wrongAnswer1, maxCount, f);
+        fgets(question.wrongAnswer2, maxCount, f);
+        fgets(question.wrongAnswer3, maxCount, f);
+//        fscanf(f, "%s\n", &question.correctAnswer);
+//        fscanf(f, "%s\n", &question.wrongAnswer1);
+//        fscanf(f, "%s\n", &question.wrongAnswer2);
+//        fscanf(f, "%s\n", &question.wrongAnswer3);
+        fscanf(f, "%d\n", &question.level);
+
+        questionList[i] = question;
+    }
+    return questionList;
 }
 
-Question *getAllQuestionsForLevel(Question *question[], int arraySize, int level, int *newSize) {
+Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level, int *newSize) {
     Question *questionsForLevel;
     int i = 0, count = 0;
     for (i; i < arraySize; ++i) {
-        if (question[i]->level == level) {
+        if (questions[i].level == level) {
             count++;
         }
     }
     questionsForLevel = (Question *) malloc(count * sizeof(Question));
-    int j=0;
+    int j = 0;
     for (i = 0; i < arraySize; ++i) {
-        if(question[i]->level==level){
-            questionsForLevel[j] = *question[i];
+        if (questions[i].level == level) {
+            questionsForLevel[j] = questions[i];
         }
     }
     *newSize = j;
     return questionsForLevel;
 }
 
+void printQuestionsForTestingPurposes(Question *questions, int size) {
+    for (int i = 0; i < size; ++i) {
+        printf("%s\n", questions[i].questionText);
+        printf("%s\n", questions[i].correctAnswer);
+        printf("%s\n", questions[i].wrongAnswer1);
+        printf("%s\n", questions[i].wrongAnswer2);
+        printf("%s\n", questions[i].wrongAnswer3);
+        printf("%d\n", questions[i].level);
+    }
+}
+
 int main() {
+    int numberOfQuestions;
+    int numberOfLevel1Questions;
+    int numberOfLevel2Questions;
+    int numberOfLevel3Questions;
+    Question *questions = getAllQuestions(&numberOfQuestions);
+
+//    debugging
+    Question question1 = questions[0];
+    printf("%s\n", question1.questionText);
+    printf("%s\n", question1.correctAnswer);
+    printf("%s\n", question1.wrongAnswer1);
+    printf("%s\n", question1.wrongAnswer2);
+    printf("%s\n", question1.wrongAnswer3);
+    printf("%d\n", question1.level);
+//    ................................
+//    printQuestionsForTestingPurposes(questions, numberOfQuestions);
+//    int numberOfQuestions = sizeof(&questions) / sizeof(questions[0]);
+
+    Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
+    Question *questionsLevel2 = getAllQuestionsForLevel(questions, numberOfQuestions, 2, &numberOfLevel2Questions);
+    Question *questionsLevel3 = getAllQuestionsForLevel(questions, numberOfQuestions, 3, &numberOfLevel3Questions);
+
+    printf("%d\n", numberOfLevel1Questions);
+    printf("%d\n", numberOfLevel2Questions);
+    printf("%d\n", numberOfLevel3Questions);
+
     printf("Welcome to Millionaire!\n");
     printf("Are you a new player? (Y/N)\n");
     char newPlayer;
