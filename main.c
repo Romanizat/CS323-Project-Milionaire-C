@@ -33,6 +33,17 @@ void getUserByUsername(char *username[], Player *player) {
     //TODO
 }
 
+char *getScoreLevelValues() {
+    FILE *f = fopen("score_values.txt", "r");
+    int stagesSize = 12;
+    char *scores = (char *) malloc(12 * 50);
+    for (int i = 0; i < stagesSize; ++i) {
+        fgets(&scores[i * 50], 50, f);
+    }
+    fclose(f);
+    return scores;
+}
+
 Question *getAllQuestions(int *newSize) {
     FILE *f = fopen("questions.txt", "r");
 
@@ -140,6 +151,12 @@ int main() {
     } else {
         printf("Unknown command\n Please try again...");
         return -1;
+    }
+
+    char *scores = getScoreLevelValues();
+    for (int i = 0; i < 12; ++i) {
+        printf("Question number %d for %s\n", i, &scores[i * 50]);
+        // TODO: read questions and offer answers
     }
 
     return 0;
