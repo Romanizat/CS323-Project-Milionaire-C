@@ -48,7 +48,7 @@ Question *getAllQuestions(int *newSize) {
 
     int questionCount;
 
-    fscanf_s(f, "%d", &questionCount);
+    fscanf_s(f, "%d\n", &questionCount);
     *newSize = questionCount;
     Question *questionList;
     questionList = (Question *) malloc(questionCount * sizeof(Question));
@@ -71,17 +71,18 @@ Question *getAllQuestions(int *newSize) {
 
 Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level, int *newSize) {
     Question *questionsForLevel;
-    int i = 0, count = 0;
-    for (i; i < arraySize; ++i) {
+    int count = 0;
+    for (int i = 0; i < arraySize; i++) {
         if (questions[i].level == level) {
             count++;
         }
     }
     questionsForLevel = (Question *) malloc(count * sizeof(Question));
     int j = 0;
-    for (i = 0; i < arraySize; ++i) {
+    for (int i = 0; i < arraySize; i++) {
         if (questions[i].level == level) {
             questionsForLevel[j] = questions[i];
+            j++;
         }
     }
     *newSize = j;
@@ -107,6 +108,24 @@ Question getRandomQuestionForLevel(Question *questions, int size) {
     return questions[random];
 }
 
+void removeItemFromArray(Question *questions, int size, int index) {
+    for (int i = index; i < size - 1; i++) {
+        questions[i] = questions[i + 1];
+    }
+}
+
+int getIndexOfQuestionInArray(Question *questions, int size, Question question) {
+    for (int i = 0; i < size; i++) {
+        if (questions[i].level == question.level
+            && questions[i].correctAnswerIndex == question.correctAnswerIndex
+            && strcmp(questions[i].questionText, question.questionText) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+
 void shuffle(int *array, size_t n) {
     srand(time(NULL));
     if (n > 1) {
@@ -126,19 +145,11 @@ int main() {
     int numberOfLevel2Questions;
     int numberOfLevel3Questions;
     Question *questions = getAllQuestions(&numberOfQuestions);
-    int answerIndexes[] = {1, 2, 3, 4};
-
-
-    printQuestionsForTestingPurposes(questions, numberOfQuestions);
-//    int numberOfQuestions = sizeof(&questions) / sizeof(questions[0]);
+    int answerIndexes[] = {0, 1, 2, 3};
 
     Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
     Question *questionsLevel2 = getAllQuestionsForLevel(questions, numberOfQuestions, 2, &numberOfLevel2Questions);
     Question *questionsLevel3 = getAllQuestionsForLevel(questions, numberOfQuestions, 3, &numberOfLevel3Questions);
-
-    printf("%d\n", numberOfLevel1Questions);
-    printf("%d\n", numberOfLevel2Questions);
-    printf("%d\n", numberOfLevel3Questions);
 
     printf("Welcome to Millionaire!\n");
     printf("Are you a new player? (Y/N)\n");
@@ -171,11 +182,16 @@ int main() {
         printf("Question number %d for %s\n", i + 1, currentScore);
         if (i < 5) {
             question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
+            removeItemFromArray(questionsLevel1, numberOfLevel1Questions,
+                                getIndexOfQuestionInArray(questionsLevel1, numberOfLevel1Questions, question));
         } else if (i < 9) {
             question = getRandomQuestionForLevel(questionsLevel2, numberOfLevel2Questions);
-
+            removeItemFromArray(questionsLevel2, numberOfLevel2Questions,
+                                getIndexOfQuestionInArray(questionsLevel2, numberOfLevel2Questions, question));
         } else {
             question = getRandomQuestionForLevel(questionsLevel3, numberOfLevel3Questions);
+            removeItemFromArray(questionsLevel3, numberOfLevel3Questions,
+                                getIndexOfQuestionInArray(questionsLevel3, numberOfLevel3Questions, question));
         }
         printf("%s", question.questionText);
         shuffle(answerIndexes, 4);
@@ -183,7 +199,7 @@ int main() {
         printf("b. %s\n", question.answers[answerIndexes[1]]);
         printf("c. %s\n", question.answers[answerIndexes[2]]);
         printf("d. %s\n", question.answers[answerIndexes[3]]);
-
+//        todo: finish the rest of answering logic and save the score to file
     }
 
     return 0;
