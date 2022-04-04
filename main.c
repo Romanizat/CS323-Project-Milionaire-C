@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <malloc.h>
+#include <time.h>
 
 /**
  * CS323 Projekat - Konzolna aplikacija Milioner - Marko Josifovic 4494
@@ -17,10 +18,8 @@
 
 typedef struct question {
     char questionText[500];
-    char correctAnswer[100];
-    char wrongAnswer1[100];
-    char wrongAnswer2[100];
-    char wrongAnswer3[100];
+    char answers[4][100];
+    int correctAnswerIndex;
     int level; //1,2,3
 } Question;
 
@@ -58,18 +57,15 @@ Question *getAllQuestions(int *newSize) {
     for (int i = 0; i < questionCount; i++) {
         Question question;
         fgets(question.questionText, maxCount, f);
-        fgets(question.correctAnswer, maxCount, f);
-        fgets(question.wrongAnswer1, maxCount, f);
-        fgets(question.wrongAnswer2, maxCount, f);
-        fgets(question.wrongAnswer3, maxCount, f);
-//        fscanf(f, "%s\n", &question.correctAnswer);
-//        fscanf(f, "%s\n", &question.wrongAnswer1);
-//        fscanf(f, "%s\n", &question.wrongAnswer2);
-//        fscanf(f, "%s\n", &question.wrongAnswer3);
+        for (int j = 0; j < 4; ++j) {
+            fgets(question.answers[j], maxCount, f);
+        }
+        fscanf(f, "%d\n", &question.correctAnswerIndex);
         fscanf(f, "%d\n", &question.level);
 
         questionList[i] = question;
     }
+    fclose(f);
     return questionList;
 }
 
@@ -95,11 +91,32 @@ Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level,
 void printQuestionsForTestingPurposes(Question *questions, int size) {
     for (int i = 0; i < size; ++i) {
         printf("%s\n", questions[i].questionText);
-        printf("%s\n", questions[i].correctAnswer);
-        printf("%s\n", questions[i].wrongAnswer1);
-        printf("%s\n", questions[i].wrongAnswer2);
-        printf("%s\n", questions[i].wrongAnswer3);
+        printf("%s\n", questions[i].answers[0]);
+        printf("%s\n", questions[i].answers[1]);
+        printf("%s\n", questions[i].answers[2]);
+        printf("%s\n", questions[i].answers[3]);
+        printf("%d\n", questions[i].correctAnswerIndex);
         printf("%d\n", questions[i].level);
+    }
+}
+
+Question getRandomQuestionForLevel(Question *questions, int size) {
+    srand(time(NULL));
+
+    int random = (rand() % (size + 1));
+    return questions[random];
+}
+
+void shuffle(int *array, size_t n) {
+    srand(time(NULL));
+    if (n > 1) {
+        size_t i;
+        for (i = 0; i < n - 1; i++) {
+            size_t j = i + rand() / (RAND_MAX / (n - i) + 1);
+            int t = array[j];
+            array[j] = array[i];
+            array[i] = t;
+        }
     }
 }
 
@@ -109,17 +126,10 @@ int main() {
     int numberOfLevel2Questions;
     int numberOfLevel3Questions;
     Question *questions = getAllQuestions(&numberOfQuestions);
+    int answerIndexes[] = {1, 2, 3, 4};
 
-//    debugging
-    Question question1 = questions[0];
-    printf("%s\n", question1.questionText);
-    printf("%s\n", question1.correctAnswer);
-    printf("%s\n", question1.wrongAnswer1);
-    printf("%s\n", question1.wrongAnswer2);
-    printf("%s\n", question1.wrongAnswer3);
-    printf("%d\n", question1.level);
-//    ................................
-//    printQuestionsForTestingPurposes(questions, numberOfQuestions);
+
+    printQuestionsForTestingPurposes(questions, numberOfQuestions);
 //    int numberOfQuestions = sizeof(&questions) / sizeof(questions[0]);
 
     Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
@@ -155,8 +165,25 @@ int main() {
 
     char *scores = getScoreLevelValues();
     for (int i = 0; i < 12; ++i) {
-        printf("Question number %d for %s\n", i, &scores[i * 50]);
-        // TODO: read questions and offer answers
+        char currentScore[100];
+        Question question;
+        strcpy(currentScore, &scores[i * 50]);
+        printf("Question number %d for %s\n", i + 1, currentScore);
+        if (i < 5) {
+            question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
+        } else if (i < 9) {
+            question = getRandomQuestionForLevel(questionsLevel2, numberOfLevel2Questions);
+
+        } else {
+            question = getRandomQuestionForLevel(questionsLevel3, numberOfLevel3Questions);
+        }
+        printf("%s", question.questionText);
+        shuffle(answerIndexes, 4);
+        printf("a. %s\n", question.answers[answerIndexes[0]]);
+        printf("b. %s\n", question.answers[answerIndexes[1]]);
+        printf("c. %s\n", question.answers[answerIndexes[2]]);
+        printf("d. %s\n", question.answers[answerIndexes[3]]);
+
     }
 
     return 0;
