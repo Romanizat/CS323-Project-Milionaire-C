@@ -1,3 +1,0 @@
-C:/Git repos/CS323-Project-Milionaire-C/cmake-build-debug/CMakeFiles/CS323_Projekat_MarkoJosifovic4494.dir
-C:/Git repos/CS323-Project-Milionaire-C/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Git repos/CS323-Project-Milionaire-C/cmake-build-debug/CMakeFiles/rebuild_cache.dir
