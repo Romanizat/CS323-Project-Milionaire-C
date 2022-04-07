@@ -226,8 +226,10 @@ int main() {
         printf("C) %s\n", question.answers[answerIndexes[2]]);
         printf("D) %s\n", question.answers[answerIndexes[3]]);
         printf("Final answer? (A, B, C, D)\n");
+        //TODO implement logic to give player chance to give up and walk away with the current score
+        //TODO implement logic to give player chance to use one of the jokers
         char playerAnswerLetter;
-        scanf("%c", &playerAnswerLetter);
+        scanf("%c\n", &playerAnswerLetter);
         char playerAnswer[100];
         strcpy(playerAnswer, question.answers[getArrayIndexFromAnswerLetter(playerAnswerLetter)]);
         if (strcmp(playerAnswer, correctAnswer) == 0) {
@@ -237,6 +239,7 @@ int main() {
                 strcpy(guaranteedScore, currentScore);
             } else if (i == 11) {
                 printf("You have won one million euros!\n");
+//                TODO implement writing user to file and end game
             }
         } else {
             printf("Your final answer for %s was incorrect!\n", currentScore);
