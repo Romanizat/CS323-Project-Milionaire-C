@@ -184,16 +184,21 @@ int main() {
             question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
             removeItemFromArray(questionsLevel1, numberOfLevel1Questions,
                                 getIndexOfQuestionInArray(questionsLevel1, numberOfLevel1Questions, question));
+            numberOfLevel1Questions--;
         } else if (i < 9) {
             question = getRandomQuestionForLevel(questionsLevel2, numberOfLevel2Questions);
             removeItemFromArray(questionsLevel2, numberOfLevel2Questions,
                                 getIndexOfQuestionInArray(questionsLevel2, numberOfLevel2Questions, question));
+            numberOfLevel2Questions--;
         } else {
             question = getRandomQuestionForLevel(questionsLevel3, numberOfLevel3Questions);
             removeItemFromArray(questionsLevel3, numberOfLevel3Questions,
                                 getIndexOfQuestionInArray(questionsLevel3, numberOfLevel3Questions, question));
+            numberOfLevel3Questions--;
         }
         printf("%s", question.questionText);
+        char correctAnswer[100];
+        strcpy(correctAnswer, question.answers[question.correctAnswerIndex]);
         shuffle(answerIndexes, 4);
         printf("a. %s\n", question.answers[answerIndexes[0]]);
         printf("b. %s\n", question.answers[answerIndexes[1]]);
