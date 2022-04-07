@@ -139,6 +139,26 @@ void shuffle(int *array, size_t n) {
     }
 }
 
+
+int getArrayIndexFromAnswerLetter(char letter) {
+    switch (letter) {
+        case 'A':
+        case 'a':
+            return 0;
+        case 'B':
+        case 'b':
+            return 1;
+        case 'C':
+        case 'c':
+            return 2;
+        case 'D':
+        case 'd':
+            return 3;
+        default:
+            return -1;
+    }
+}
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
@@ -177,6 +197,7 @@ int main() {
     char *scores = getScoreLevelValues();
     for (int i = 0; i < 12; ++i) {
         char currentScore[100];
+        char guaranteedScore[100]; //TODO implement logic for guaranteed score
         Question question;
         strcpy(currentScore, &scores[i * 50]);
         printf("Question number %d for %s\n", i + 1, currentScore);
@@ -200,10 +221,29 @@ int main() {
         char correctAnswer[100];
         strcpy(correctAnswer, question.answers[question.correctAnswerIndex]);
         shuffle(answerIndexes, 4);
-        printf("a. %s\n", question.answers[answerIndexes[0]]);
-        printf("b. %s\n", question.answers[answerIndexes[1]]);
-        printf("c. %s\n", question.answers[answerIndexes[2]]);
-        printf("d. %s\n", question.answers[answerIndexes[3]]);
+        printf("A) %s\n", question.answers[answerIndexes[0]]);
+        printf("B) %s\n", question.answers[answerIndexes[1]]);
+        printf("C) %s\n", question.answers[answerIndexes[2]]);
+        printf("D) %s\n", question.answers[answerIndexes[3]]);
+        printf("Final answer? (A, B, C, D)\n");
+        char playerAnswerLetter;
+        scanf("%c", &playerAnswerLetter);
+        char playerAnswer[100];
+        strcpy(playerAnswer, question.answers[getArrayIndexFromAnswerLetter(playerAnswerLetter)]);
+        if (strcmp(playerAnswer, correctAnswer) == 0) {
+            printf("Your final answer for %s was correct!\n", currentScore);
+            if (i == 5 || i == 9) {
+                printf("You have achieved a guaranteed value!\n");
+                strcpy(guaranteedScore, currentScore);
+            } else if (i == 11) {
+                printf("You have won one million euros!\n");
+            }
+        } else {
+            printf("Your final answer for %s was incorrect!\n", currentScore);
+            printf("The correct answer was %s\n", correctAnswer);
+        }
+
+
 //        todo: finish the rest of answering logic and save the score to file
     }
 
