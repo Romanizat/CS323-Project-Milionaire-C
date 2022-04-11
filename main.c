@@ -159,6 +159,39 @@ int getArrayIndexFromAnswerLetter(char letter) {
     }
 }
 
+char getLetterFromNumber(int number) {
+    switch (number) {
+        case 0:
+            return 'A';
+        case 1:
+            return 'B';
+        case 2:
+            return 'C';
+        case 3:
+            return 'D';
+        default:
+            return -1;
+    }
+}
+
+int getRandomNumber(int min, int max) {
+    srand(time(NULL));
+    return rand() % (max - min + 1) + min;
+}
+
+int randomPercentage() {
+    return rand() % 101;
+}
+
+void phoneFriendJoker() {
+    printf("------------------------------------------------------\n");
+    printf("Friend: I think it's %c\n", getLetterFromNumber(getRandomNumber(0, 3)));
+    printf("You: How certain are you?\n");
+    printf("Friend: I'm %d%% certain\n", randomPercentage());
+    printf("------------------------------------------------------\n");
+}
+
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
@@ -170,6 +203,11 @@ int main() {
     Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
     Question *questionsLevel2 = getAllQuestionsForLevel(questions, numberOfQuestions, 2, &numberOfLevel2Questions);
     Question *questionsLevel3 = getAllQuestionsForLevel(questions, numberOfQuestions, 3, &numberOfLevel3Questions);
+
+    int jokerFriend = 1;
+    int jokerFiftyFifty = 1;
+    int jokerAudience = 1;
+    int jokerChangeQuestion = 1; // after level 1
 
     printf("Welcome to Millionaire!\n");
     printf("Are you a new player? (Y/N)\n");
@@ -225,9 +263,73 @@ int main() {
         printf("B) %s\n", question.answers[answerIndexes[1]]);
         printf("C) %s\n", question.answers[answerIndexes[2]]);
         printf("D) %s\n", question.answers[answerIndexes[3]]);
+        printf("\n");
+        printf("Would you like to use a joker? (Y/N)\n");
+        char useJoker;
+//        while (getchar() != '\n');
+        scanf("%c", &useJoker);
+        scanf("%c", &useJoker);
+        if (useJoker == 'Y' || useJoker == 'y') {
+            printf("Which joker would you like to use?\n");
+            if (jokerFriend == 1) {
+                printf("1. Phone a Friend\n");
+            }
+            if (jokerFiftyFifty == 1) {
+                printf("2. Fifty-Fifty\n");
+            }
+            if (jokerAudience == 1) {
+                printf("3. Help of the Audience\n");
+            }
+            if (i >= 5 && jokerChangeQuestion == 1) {
+                printf("4. Change the Question\n");
+            }
+            char joker;
+            while (getchar() != '\n');
+            scanf("%c", &joker);
+            switch (joker) {
+                case '1':
+                    if (jokerFriend == 1) {
+                        phoneFriendJoker();
+                        printf("You have used the Phone a friend joker!\n");
+                        jokerFriend = 0;
+                    } else {
+                        printf("You have already used the Phone a friend joker!\n");
+                    }
+                    break;
+                case '2':
+                    if (jokerFiftyFifty == 1) {
+                        // TODO: implement logic for fifty-fifty joker
+                        printf("You have used the Fifty-fifty joker!\n");
+                        jokerFiftyFifty = 0;
+                    } else {
+                        printf("You have already used the Fifty-fifty joker!!\n");
+                    }
+                    break;
+                case '3':
+                    if (jokerAudience == 1) {
+                        // Todo: implement logic for audience joker
+                        printf("You have used the Ask the Audience joker!\n");
+                        jokerAudience = 0;
+                    } else {
+                        printf("You have already used the Ask the Audience joker!\n");
+                    }
+                    break;
+                case '4':
+                    if (jokerChangeQuestion == 1) {
+                        // TODO: implement logic for change question joker
+                        printf("You have used your change question joker!\n");
+                        jokerChangeQuestion = 0;
+                    } else {
+                        printf("You have already used your change question joker!\n");
+                    }
+                    break;
+                default:
+                    printf("Unknown command...\n");
+                    return -1;
+            }
+        }
         printf("Final answer? (A, B, C, D)\n");
         //TODO implement logic to give player chance to give up and walk away with the current score
-        //TODO implement logic to give player chance to use one of the jokers
         char playerAnswerLetter;
         while (getchar() != '\n');
         scanf("%c", &playerAnswerLetter);
