@@ -229,9 +229,10 @@ int main() {
         //TODO implement logic to give player chance to give up and walk away with the current score
         //TODO implement logic to give player chance to use one of the jokers
         char playerAnswerLetter;
-        scanf("%c\n", &playerAnswerLetter);
+        while (getchar() != '\n');
+        scanf("%c", &playerAnswerLetter);
         char playerAnswer[100];
-        strcpy(playerAnswer, question.answers[getArrayIndexFromAnswerLetter(playerAnswerLetter)]);
+        strcpy(playerAnswer, question.answers[answerIndexes[getArrayIndexFromAnswerLetter(playerAnswerLetter)]]);
         if (strcmp(playerAnswer, correctAnswer) == 0) {
             printf("Your final answer for %s was correct!\n", currentScore);
             if (i == 5 || i == 9) {
@@ -243,7 +244,9 @@ int main() {
             }
         } else {
             printf("Your final answer for %s was incorrect!\n", currentScore);
+            printf("Your answer was %s\n", playerAnswer);
             printf("The correct answer was %s\n", correctAnswer);
+            break;
         }
 
 
