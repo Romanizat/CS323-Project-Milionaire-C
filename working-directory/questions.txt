@@ -83,3 +83,143 @@ Rat-a-tat-tat
 Cooee
 0
 1
+How many combinations of dots are possible in Braille?
+63
+49
+87
+75
+0
+3
+What is the Italian word for a square or marketplace?
+Piazza
+Pisa
+Presto
+Plaza
+0
+2
+Who wrote the novels that introduced the characters Hercule Poirot?
+Agatha Christie
+Ellery Queen
+Ruth Rendell
+H. G. Wells
+0
+2
+What chemical is added to the water in swimming pools?
+Chlorine
+Ammonia
+Sulfur
+Vinegar
+0
+1
+What nationality is celebrated on St. Patrick's Day?
+Irish
+American
+Mexican
+Welsh
+0
+1
+According to Lesley Gore's hit song, 'It's my party and I'll ______ if I want to'?
+Cry
+Yell
+Kiss
+Dance
+0
+2
+The game of Mah-Jong originated in what country?
+China
+Japan
+England
+Russia
+0
+2
+Which of these phrases refers to a brief success?
+Flash in the pan
+Flare in the jug
+Spark in the tub
+Blaze in the pot
+0
+2
+Which of these is a type of hat?
+Pork pie
+Sausage roll
+Scotch egg
+Potato crisp
+0
+2
+Which of these countries has banned smoking?
+Bhutan
+Russia
+New Zealand
+Belgium
+0
+2
+What is the smallest country in the world?
+Vatican City
+Malta
+Luxembourg
+Monaco
+0
+2
+In which year was the first iPhone released?
+2007
+2008
+2005
+2009
+0
+2
+The hammer and sickle is one of the most recognizable symbols of which political ideology?
+Communism
+Fascism
+Liberalism
+Conservatism
+0
+2
+Bundle of sticks and an axe are one of the most recognizable symbols of which political ideology?
+Fascism
+Communism
+Liberalism
+Conservatism
+0
+2
+What was the only painting sold by Vincent van Gogh during his lifetime?
+Red Vineyard
+Starry Night
+Sunflowers
+Irises
+0
+2
+The code in The Matrix comes from what food recipes?
+Sushi recipes
+Dumpling recipes
+Stir-fry recipes
+Pad thai recipes
+0
+3
+Where were The Lord of the Rings movies filmed?
+New Zealand
+Ireland
+Iceland
+Australia
+0
+3
+Which country does Forrest Gump travel to as part of the All-American Ping-Pong Team?
+China
+Vietnam
+Singapore
+Japan
+0
+3
+Which scientific unit is named after an Italian nobleman?
+Volt
+Kelvin
+Amper
+Mole
+0
+2
+“Nephelococcygia” is the practice of doing what?
+Finding shapes in clouds
+Finding shapes in the shadows
+Finding shapes in coffee
+Finding shapes in tea
+0
+3
