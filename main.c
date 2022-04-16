@@ -192,6 +192,52 @@ void phoneFriendJoker() {
 }
 
 
+//int *getRandomNumbersThatAddUpTo100() {
+//    int *numbers = (int *) malloc(sizeof(int) * 4);
+//    int sum = 0;
+//    while (sum != 100) {
+//        sum = 0;
+//        numbers[0] = getRandomNumber(0, 100);
+//        sum += numbers[0];
+//        numbers[1] = getRandomNumber(0, 100 - sum);
+//        sum += numbers[1];
+//        numbers[2] = getRandomNumber(0, 100 - sum);
+//        sum += numbers[2];
+//        numbers[3] = getRandomNumber(0, 100 - sum);
+//        sum += numbers[3];
+//
+//    }
+//    return numbers;
+//}
+
+int *getRandomNumbersThatAddUpTo100() {
+    int *numbers = (int *) malloc(sizeof(int) * 4);
+    int sum = 0;
+    numbers[0] = getRandomNumber(0, 100);
+    while (sum != 100) {
+        sum = 0;
+        sum += numbers[0];
+        numbers[1] = getRandomNumber(0, 100 - sum);
+        sum += numbers[1];
+        numbers[2] = getRandomNumber(0, 100 - sum);
+        sum += numbers[2];
+        numbers[3] = getRandomNumber(0, 100 - sum);
+        sum += numbers[3];
+
+    }
+    return numbers;
+}
+
+void askTheAudience() {
+    int *arr = getRandomNumbersThatAddUpTo100();
+    printf("------------------------------------------------------\n");
+    printf("A) %d\n", arr[0]);
+    printf("B) %d\n", arr[1]);
+    printf("C) %d\n", arr[2]);
+    printf("D) %d\n", arr[3]);
+    printf("------------------------------------------------------\n");
+}
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
@@ -307,7 +353,7 @@ int main() {
                     break;
                 case '3':
                     if (jokerAudience == 1) {
-                        // Todo: implement logic for audience joker
+                        askTheAudience();
                         printf("You have used the Ask the Audience joker!\n");
                         jokerAudience = 0;
                     } else {
