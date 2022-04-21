@@ -28,9 +28,6 @@ typedef struct player {
     char score[100];
 } Player;
 
-void getUserByUsername(char *username[], Player *player) {
-    //TODO
-}
 
 char *getScoreLevelValues() {
     FILE *f = fopen("score_values.txt", "r");
@@ -252,12 +249,26 @@ void askTheAudience() {
     printf("------------------------------------------------------\n");
 }
 
+int getPlayerIndexByUsername(Player *players, int size, char *username) {
+    for (int i = 0; i < size; i++) {
+        if (strcmp(players[i].username, username) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
+void printPlayerScore(Player player) {
+    printf("Your previous score was: %s", &player.score);
+}
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
     int numberOfLevel2Questions;
     int numberOfLevel3Questions;
     int numberOfPlayers;
+    int playerIndexInList;
     Question *questions = getAllQuestions(&numberOfQuestions);
     int answerIndexes[] = {0, 1, 2, 3};
     Player *players = getAllPlayers(&numberOfPlayers);
@@ -281,17 +292,32 @@ int main() {
         printf("Welcome new player!\n");
         printf("Please enter the username you will be using:\n");
         scanf("%s", &username);
-        strcpy(player.username, username);
-        //TODO: boolean method to check if username already exists
-        printf("Welcome %s!\n", &player.username);
+        playerIndexInList = getPlayerIndexByUsername(players, numberOfPlayers, username);
+        if (playerIndexInList == -1) {
+            strcpy(player.username, username);
+            printf("Welcome %s!\n", &player.username);
+        } else {
+            player = players[playerIndexInList];
+            printf("Player already exists!\nWill continue game with player %s\n.", &player.username);
+            printPlayerScore(player);
+        }
     } else if (newPlayer == 'N' || newPlayer == 'n') {
-        printf("Welcome back!\n");
         printf("Please enter your username:\n");
         scanf("%s", &username);
-        //TODO: get user from file and tell user of his previous score
+        playerIndexInList = getPlayerIndexByUsername(players, numberOfPlayers, username);
+        if (playerIndexInList == -1) {
+            printf("User with username %s not found\n", &username);
+            strcpy(player.username, username);
+            printf("Player doesn't exist!\nWill continue game as new player %s.\n", &player.username);
+            printf("Welcome %s!\n", &player.username);
+        } else {
+            player = players[playerIndexInList];
+            printf("Welcome back %s!\n", &player.username);
+            printPlayerScore(player);
+        }
     } else {
-        printf("Unknown command\n Please try again...");
-        return -1;
+        printf("Unknown command\n Please try again...\n");
+                return -1;
     }
 
     char *scores = getScoreLevelValues();
@@ -328,7 +354,6 @@ int main() {
         printf("\n");
         printf("Would you like to use a joker? (Y/N)\n");
         char useJoker;
-//        while (getchar() != '\n');
         scanf("%c", &useJoker);
         scanf("%c", &useJoker);
         if (useJoker == 'Y' || useJoker == 'y') {
@@ -407,7 +432,7 @@ int main() {
                 printf("You have won one million euros!\n");
 //                TODO implement writing user to file and end game
                 strcpy(player.score, currentScore);
-//                writePlayersToFile(&player);
+                writePlayersToFile(&player, numberOfPlayers);
             }
         } else {
             printf("Your final answer for %s was incorrect!\n", currentScore);
