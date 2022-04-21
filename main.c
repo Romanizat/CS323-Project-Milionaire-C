@@ -69,6 +69,38 @@ Question *getAllQuestions(int *newSize) {
     return questionList;
 }
 
+Player *getAllPlayers(int *newSize) {
+    FILE *f = fopen("players.txt", "r");
+
+    int playerCount;
+
+    fscanf_s(f, "%d\n", &playerCount);
+    *newSize = playerCount;
+    Player *playerList;
+    playerList = (Player *) malloc(playerCount * sizeof(Player));
+    int maxCount = 500;
+
+    for (int i = 0; i < playerCount; i++) {
+        Player player;
+        fgets(player.username, maxCount, f);
+        fgets(player.score, maxCount, f);
+
+        playerList[i] = player;
+    }
+    fclose(f);
+    return playerList;
+}
+
+void writePlayersToFile(Player *players, int size) {
+    FILE *f = fopen("players.txt", "w");
+    fprintf(f, "%d\n", size);
+    for (int i = 0; i < size; ++i) {
+        fprintf(f, "%s", players[i].username);
+        fprintf(f, "%s", players[i].score);
+    }
+    fclose(f);
+}
+
 Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level, int *newSize) {
     Question *questionsForLevel;
     int count = 0;
@@ -180,6 +212,7 @@ int getRandomNumber(int min, int max) {
 }
 
 int randomPercentage() {
+    srand(time(NULL));
     return rand() % 101;
 }
 
@@ -190,25 +223,6 @@ void phoneFriendJoker() {
     printf("Friend: I'm %d%% certain\n", randomPercentage());
     printf("------------------------------------------------------\n");
 }
-
-
-//int *getRandomNumbersThatAddUpTo100() {
-//    int *numbers = (int *) malloc(sizeof(int) * 4);
-//    int sum = 0;
-//    while (sum != 100) {
-//        sum = 0;
-//        numbers[0] = getRandomNumber(0, 100);
-//        sum += numbers[0];
-//        numbers[1] = getRandomNumber(0, 100 - sum);
-//        sum += numbers[1];
-//        numbers[2] = getRandomNumber(0, 100 - sum);
-//        sum += numbers[2];
-//        numbers[3] = getRandomNumber(0, 100 - sum);
-//        sum += numbers[3];
-//
-//    }
-//    return numbers;
-//}
 
 int *getRandomNumbersThatAddUpTo100() {
     int *numbers = (int *) malloc(sizeof(int) * 4);
@@ -231,10 +245,10 @@ int *getRandomNumbersThatAddUpTo100() {
 void askTheAudience() {
     int *arr = getRandomNumbersThatAddUpTo100();
     printf("------------------------------------------------------\n");
-    printf("A) %d\n", arr[0]);
-    printf("B) %d\n", arr[1]);
-    printf("C) %d\n", arr[2]);
-    printf("D) %d\n", arr[3]);
+    printf("A) %d%%\n", arr[0]);
+    printf("B) %d%%\n", arr[1]);
+    printf("C) %d%%\n", arr[2]);
+    printf("D) %d%%\n", arr[3]);
     printf("------------------------------------------------------\n");
 }
 
@@ -243,8 +257,10 @@ int main() {
     int numberOfLevel1Questions;
     int numberOfLevel2Questions;
     int numberOfLevel3Questions;
+    int numberOfPlayers;
     Question *questions = getAllQuestions(&numberOfQuestions);
     int answerIndexes[] = {0, 1, 2, 3};
+    Player *players = getAllPlayers(&numberOfPlayers);
 
     Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
     Question *questionsLevel2 = getAllQuestionsForLevel(questions, numberOfQuestions, 2, &numberOfLevel2Questions);
@@ -324,7 +340,7 @@ int main() {
                 printf("2. Fifty-Fifty\n");
             }
             if (jokerAudience == 1) {
-                printf("3. Help of the Audience\n");
+                printf("3. Ask the Audience\n");
             }
             if (i >= 5 && jokerChangeQuestion == 1) {
                 printf("4. Change the Question\n");
@@ -381,14 +397,17 @@ int main() {
         scanf("%c", &playerAnswerLetter);
         char playerAnswer[100];
         strcpy(playerAnswer, question.answers[answerIndexes[getArrayIndexFromAnswerLetter(playerAnswerLetter)]]);
+        printf("-----------------------------------------------------\n");
         if (strcmp(playerAnswer, correctAnswer) == 0) {
             printf("Your final answer for %s was correct!\n", currentScore);
-            if (i == 5 || i == 9) {
+            if (i == 4 || i == 8) {
                 printf("You have achieved a guaranteed value!\n");
                 strcpy(guaranteedScore, currentScore);
             } else if (i == 11) {
                 printf("You have won one million euros!\n");
 //                TODO implement writing user to file and end game
+                strcpy(player.score, currentScore);
+//                writePlayersToFile(&player);
             }
         } else {
             printf("Your final answer for %s was incorrect!\n", currentScore);
