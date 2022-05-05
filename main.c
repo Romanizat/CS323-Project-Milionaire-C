@@ -92,8 +92,8 @@ void writePlayersToFile(Player *players, int size) {
     FILE *f = fopen("players.txt", "w");
     fprintf(f, "%d\n", size);
     for (int i = 0; i < size; ++i) {
-        fprintf(f, "%s", players[i].username);
-        fprintf(f, "%s", players[i].score);
+        fprintf(f, "%s\n", players[i].username);
+        fprintf(f, "%s\n", players[i].score);
     }
     fclose(f);
 }
@@ -262,6 +262,12 @@ void printPlayerScore(Player player) {
     printf("Your previous score was: %s", &player.score);
 }
 
+//function that adds new Player to the array
+void addNewPlayerToList(Player *players, int *size, Player player) {
+    *size += 1;
+    players[*size] = player;
+}
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
@@ -317,13 +323,14 @@ int main() {
         }
     } else {
         printf("Unknown command\n Please try again...\n");
-                return -1;
+        return -1;
     }
 
     char *scores = getScoreLevelValues();
     for (int i = 0; i < 12; ++i) {
         char currentScore[100];
         char guaranteedScore[100]; //TODO implement logic for guaranteed score
+        strcpy(guaranteedScore, "0€");
         Question question;
         strcpy(currentScore, &scores[i * 50]);
         printf("Question number %d for %s\n", i + 1, currentScore);
@@ -432,12 +439,23 @@ int main() {
                 printf("You have won one million euros!\n");
 //                TODO implement writing user to file and end game
                 strcpy(player.score, currentScore);
+                if (playerIndexInList == -1) {
+                    addNewPlayerToList(players, &numberOfPlayers, player);
+                }
                 writePlayersToFile(&player, numberOfPlayers);
             }
         } else {
             printf("Your final answer for %s was incorrect!\n", currentScore);
             printf("Your answer was %s\n", playerAnswer);
             printf("The correct answer was %s\n", correctAnswer);
+
+//            TODO: add case if player decides to walk away with current score
+            printf("You have earned a guaranteed sum of  %s\n", guaranteedScore);
+            strcpy(player.score, guaranteedScore);
+            if (playerIndexInList == -1) {
+                addNewPlayerToList(players, &numberOfPlayers, player);
+            }
+            writePlayersToFile(&player, numberOfPlayers);
             break;
         }
 
