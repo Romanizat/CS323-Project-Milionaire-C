@@ -352,14 +352,17 @@ int main() {
         return -1;
     }
 
+    m_printf("To quit and walk away with the current score enter Q when answering the question\n");
     char *scores = getScoreLevelValues();
+    char currentQuestionScore[100];
     char currentScore[100];
     char guaranteedScore[100];
     strcpy(guaranteedScore, "0€");
+    strcpy(currentScore, "0€");
     for (int i = 0; i < 12; ++i) {
         Question question;
-        strcpy(currentScore, &scores[i * 50]);
-        m_printf("Question number %d for %s\n", i + 1, currentScore);
+        strcpy(currentQuestionScore, &scores[i * 50]);
+        m_printf("Question number %d for %s\n", i + 1, currentQuestionScore);
         if (i < 5) {
             question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
             removeItemFromArray(questionsLevel1, numberOfLevel1Questions,
@@ -451,22 +454,34 @@ int main() {
             }
         }
         m_printf("Final answer? (A, B, C, D)\n");
-        //TODO implement logic to give player chance to give up and walk away with the current score
         char playerAnswerLetter;
         while (getchar() != '\n');
         scanf("%c", &playerAnswerLetter);
+        if (playerAnswerLetter == 'q' || playerAnswerLetter == 'Q') {
+            m_printf("You have decided to quit :(\nYou have won %s\n", currentScore);
+            m_printf("Goodbye!\n");
+            strcpy(player.score, currentQuestionScore);
+            if (playerIndexInList == -1) {
+                addNewPlayerToList(&players, &numberOfPlayers, player);
+            } else {
+                strcpy(players[playerIndexInList].score, guaranteedScore);
+            }
+            writePlayersToFile(players, numberOfPlayers);
+
+            break;
+        }
         char playerAnswer[100];
         strcpy(playerAnswer, question.answers[answerIndexes[getArrayIndexFromAnswerLetter(playerAnswerLetter)]]);
         m_printf("-----------------------------------------------------\n");
         if (strcmp(playerAnswer, correctAnswer) == 0) {
-            m_printf("Your final answer for %s was correct!\n", currentScore);
+            m_printf("Your final answer for %s was correct!\n", currentQuestionScore);
+            strcpy(currentScore, currentQuestionScore);
             if (i == 4 || i == 8) {
                 m_printf("You have achieved a guaranteed value!\n");
-                strcpy(guaranteedScore, currentScore);
+                strcpy(guaranteedScore, currentQuestionScore);
             } else if (i == 11) {
                 m_printf("You have won one million euros!\n");
-//                TODO implement writing user to file and end game
-                strcpy(player.score, currentScore);
+                strcpy(player.score, currentQuestionScore);
                 if (playerIndexInList == -1) {
                     addNewPlayerToList(&players, &numberOfPlayers, player);
                 } else {
@@ -475,11 +490,9 @@ int main() {
                 writePlayersToFile(players, numberOfPlayers);
             }
         } else {
-            m_printf("Your final answer for %s was incorrect!\n", currentScore);
+            m_printf("Your final answer for %s was incorrect!\n", currentQuestionScore);
             m_printf("Your answer was %s\n", playerAnswer);
             m_printf("The correct answer was %s\n", correctAnswer);
-
-//            TODO: add case if player decides to walk away with current score
             m_printf("You have earned a guaranteed sum of %s\n", guaranteedScore);
             strcpy(player.score, guaranteedScore);
             if (playerIndexInList == -1) {
@@ -491,9 +504,6 @@ int main() {
             writePlayersToFile(players, numberOfPlayers);
             break;
         }
-
-
-//        todo: finish the rest of answering logic and save the score to file
     }
     fflush(players_file);
     fclose(players_file);
