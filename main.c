@@ -9,13 +9,6 @@
 /**
  * CS323 Projekat - Konzolna aplikacija Milioner - Marko Josifovic 4494
  *
- * Postoji 12 pitanja rasporedjenih u 3 nivoa
- * Dakle za svaki nivo imacemo jednu listu pitanja
- * Pravilo: nakon nekih nivoa korisniku se cuva ta suma, preko nekog nivoa korisnik moze da odluci da zadrzi trenutnu sumu ili nastavi dalje???
- * Tri pomoci: Pomoc prijatelja (program random bira jedno od ponudjenih odgovora), Pomoc publike (random procenat za 4 ponudjena odgovora), Pola pola (program ostavi tacan i jedan netacan odgovor)
- * Pomoci se mogu iskoristiti tek nakon predjenog 1. nivoa
- *
- *
  */
 
 
@@ -288,6 +281,17 @@ void printPlayers(Player *players, int size) {
     }
 }
 
+int areJokersAvailable(int level, int jokerFriend,
+                       int jokerFiftyFifty,
+                       int jokerAudience,
+                       int jokerChangeQuestion) {
+    if (level < 5) {
+        return (jokerFriend == 1 || jokerFiftyFifty == 1 || jokerAudience == 1);
+    } else {
+        return (jokerFriend == 1 || jokerFiftyFifty == 1 || jokerAudience == 1 || jokerChangeQuestion == 1);
+    }
+}
+
 int main() {
     int numberOfQuestions;
     int numberOfLevel1Questions;
@@ -350,7 +354,7 @@ int main() {
 
     char *scores = getScoreLevelValues();
     char currentScore[100];
-    char guaranteedScore[100]; //TODO implement logic for guaranteed score
+    char guaranteedScore[100];
     strcpy(guaranteedScore, "0€");
     for (int i = 0; i < 12; ++i) {
         Question question;
@@ -381,67 +385,69 @@ int main() {
         m_printf("C) %s\n", question.answers[answerIndexes[2]]);
         m_printf("D) %s\n", question.answers[answerIndexes[3]]);
         m_printf("\n");
-        m_printf("Would you like to use a joker? (Y/N)\n");
-        char useJoker;
-        scanf("%c", &useJoker);
-        scanf("%c", &useJoker);
-        if (useJoker == 'Y' || useJoker == 'y') {
-            m_printf("Which joker would you like to use?\n");
-            if (jokerFriend == 1) {
-                m_printf("1. Phone a Friend\n");
-            }
-            if (jokerFiftyFifty == 1) {
-                m_printf("2. Fifty-Fifty\n");
-            }
-            if (jokerAudience == 1) {
-                m_printf("3. Ask the Audience\n");
-            }
-            if (i >= 5 && jokerChangeQuestion == 1) {
-                m_printf("4. Change the Question\n");
-            }
-            char joker;
-            while (getchar() != '\n');
-            scanf("%c", &joker);
-            switch (joker) {
-                case '1':
-                    if (jokerFriend == 1) {
-                        phoneFriendJoker();
-                        m_printf("You have used the Phone a friend joker!\n");
-                        jokerFriend = 0;
-                    } else {
-                        m_printf("You have already used the Phone a friend joker!\n");
-                    }
-                    break;
-                case '2':
-                    if (jokerFiftyFifty == 1) {
-                        // TODO: implement logic for fifty-fifty joker
-                        m_printf("You have used the Fifty-fifty joker!\n");
-                        jokerFiftyFifty = 0;
-                    } else {
-                        m_printf("You have already used the Fifty-fifty joker!!\n");
-                    }
-                    break;
-                case '3':
-                    if (jokerAudience == 1) {
-                        askTheAudience();
-                        m_printf("You have used the Ask the Audience joker!\n");
-                        jokerAudience = 0;
-                    } else {
-                        m_printf("You have already used the Ask the Audience joker!\n");
-                    }
-                    break;
-                case '4':
-                    if (jokerChangeQuestion == 1) {
-                        // TODO: implement logic for change question joker
-                        m_printf("You have used your change question joker!\n");
-                        jokerChangeQuestion = 0;
-                    } else {
-                        m_printf("You have already used your change question joker!\n");
-                    }
-                    break;
-                default:
-                    m_printf("Unknown command...\n");
-                    return -1;
+        if (areJokersAvailable(i, jokerFriend, jokerFiftyFifty, jokerAudience, jokerChangeQuestion)) {
+            m_printf("Would you like to use a joker? (Y/N)\n");
+            char useJoker;
+            scanf("%c", &useJoker);
+            scanf("%c", &useJoker);
+            if (useJoker == 'Y' || useJoker == 'y') {
+                m_printf("Which joker would you like to use?\n");
+                if (jokerFriend == 1) {
+                    m_printf("1. Phone a Friend\n");
+                }
+                if (jokerFiftyFifty == 1) {
+                    m_printf("2. Fifty-Fifty\n");
+                }
+                if (jokerAudience == 1) {
+                    m_printf("3. Ask the Audience\n");
+                }
+                if (i >= 5 && jokerChangeQuestion == 1) {
+                    m_printf("4. Change the Question\n");
+                }
+                char joker;
+                while (getchar() != '\n');
+                scanf("%c", &joker);
+                switch (joker) {
+                    case '1':
+                        if (jokerFriend == 1) {
+                            phoneFriendJoker();
+                            m_printf("You have used the Phone a friend joker!\n");
+                            jokerFriend = 0;
+                        } else {
+                            m_printf("You have already used the Phone a friend joker!\n");
+                        }
+                        break;
+                    case '2':
+                        if (jokerFiftyFifty == 1) {
+                            // TODO: implement logic for fifty-fifty joker
+                            m_printf("You have used the Fifty-fifty joker!\n");
+                            jokerFiftyFifty = 0;
+                        } else {
+                            m_printf("You have already used the Fifty-fifty joker!!\n");
+                        }
+                        break;
+                    case '3':
+                        if (jokerAudience == 1) {
+                            askTheAudience();
+                            m_printf("You have used the Ask the Audience joker!\n");
+                            jokerAudience = 0;
+                        } else {
+                            m_printf("You have already used the Ask the Audience joker!\n");
+                        }
+                        break;
+                    case '4':
+                        if (jokerChangeQuestion == 1) {
+                            // TODO: implement logic for change question joker
+                            m_printf("You have used your change question joker!\n");
+                            jokerChangeQuestion = 0;
+                        } else {
+                            m_printf("You have already used your change question joker!\n");
+                        }
+                        break;
+                    default:
+                        m_printf("Unknown command...\n");
+                        return -1;
+                }
             }
         }
         m_printf("Final answer? (A, B, C, D)\n");
