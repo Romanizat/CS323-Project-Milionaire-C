@@ -2,6 +2,9 @@
 #include <string.h>
 #include <malloc.h>
 #include <time.h>
+#include <stdarg.h>
+#include <stdlib.h>
+#include <unistd.h>
 
 /**
  * CS323 Projekat - Konzolna aplikacija Milioner - Marko Josifovic 4494
@@ -23,18 +26,30 @@ typedef struct question {
     int level; //1,2,3
 } Question;
 
+#define PLAYER_ATTR_MAX 100
 typedef struct player {
-    char username[100];
-    char score[100];
+    char username[PLAYER_ATTR_MAX];
+    char score[PLAYER_ATTR_MAX];
 } Player;
 
+FILE *players_file;
+
+// wrapper for debugger
+void m_printf(const char *text, ...) {
+    va_list args;
+    va_start(args, text);
+    vprintf(text, args);
+    fflush(stdout);
+    va_end(args);
+}
 
 char *getScoreLevelValues() {
     FILE *f = fopen("score_values.txt", "r");
     int stagesSize = 12;
-    char *scores = (char *) malloc(12 * 50);
+    char *scores = (char *) calloc(12, 50);
     for (int i = 0; i < stagesSize; ++i) {
         fgets(&scores[i * 50], 50, f);
+        scores[(strlen(&scores[i * 50]) + i * 50) - 1] = '\0';
     }
     fclose(f);
     return scores;
@@ -67,35 +82,34 @@ Question *getAllQuestions(int *newSize) {
 }
 
 Player *getAllPlayers(int *newSize) {
-    FILE *f = fopen("players.txt", "r");
 
     int playerCount;
 
-    fscanf_s(f, "%d\n", &playerCount);
+    fscanf(players_file, "%d\n", &playerCount);
+    if (playerCount > 20 || playerCount < 0) {
+        playerCount = 0;
+    }
     *newSize = playerCount;
-    Player *playerList;
-    playerList = (Player *) malloc(playerCount * sizeof(Player));
-    int maxCount = 500;
+    Player *playerList = (Player *) malloc(playerCount * sizeof(Player));
 
     for (int i = 0; i < playerCount; i++) {
         Player player;
-        fgets(player.username, maxCount, f);
-        fgets(player.score, maxCount, f);
-
+        fgets(player.username, PLAYER_ATTR_MAX, players_file);
+        player.username[strlen(player.username) - 1] = '\0';
+        fgets(player.score, PLAYER_ATTR_MAX, players_file);
+        player.score[strlen(player.score) - 1] = '\0';
         playerList[i] = player;
     }
-    fclose(f);
     return playerList;
 }
 
 void writePlayersToFile(Player *players, int size) {
-    FILE *f = fopen("players.txt", "w");
-    fprintf(f, "%d\n", size);
+    ftruncate(fileno(players_file), 0);
+    fprintf(players_file, "%d\n", size);
     for (int i = 0; i < size; ++i) {
-        fprintf(f, "%s\n", players[i].username);
-        fprintf(f, "%s\n", players[i].score);
+        fprintf(players_file, "%s\n", players[i].username);
+        fprintf(players_file, "%s\n", players[i].score);
     }
-    fclose(f);
 }
 
 Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level, int *newSize) {
@@ -120,13 +134,13 @@ Question *getAllQuestionsForLevel(Question *questions, int arraySize, int level,
 
 void printQuestionsForTestingPurposes(Question *questions, int size) {
     for (int i = 0; i < size; ++i) {
-        printf("%s\n", questions[i].questionText);
-        printf("%s\n", questions[i].answers[0]);
-        printf("%s\n", questions[i].answers[1]);
-        printf("%s\n", questions[i].answers[2]);
-        printf("%s\n", questions[i].answers[3]);
-        printf("%d\n", questions[i].correctAnswerIndex);
-        printf("%d\n", questions[i].level);
+        m_printf("%s\n", questions[i].questionText);
+        m_printf("%s\n", questions[i].answers[0]);
+        m_printf("%s\n", questions[i].answers[1]);
+        m_printf("%s\n", questions[i].answers[2]);
+        m_printf("%s\n", questions[i].answers[3]);
+        m_printf("%d\n", questions[i].correctAnswerIndex);
+        m_printf("%d\n", questions[i].level);
     }
 }
 
@@ -214,11 +228,11 @@ int randomPercentage() {
 }
 
 void phoneFriendJoker() {
-    printf("------------------------------------------------------\n");
-    printf("Friend: I think it's %c\n", getLetterFromNumber(getRandomNumber(0, 3)));
-    printf("You: How certain are you?\n");
-    printf("Friend: I'm %d%% certain\n", randomPercentage());
-    printf("------------------------------------------------------\n");
+    m_printf("------------------------------------------------------\n");
+    m_printf("Friend: I think it's %c\n", getLetterFromNumber(getRandomNumber(0, 3)));
+    m_printf("You: How certain are you?\n");
+    m_printf("Friend: I'm %d%% certain\n", randomPercentage());
+    m_printf("------------------------------------------------------\n");
 }
 
 int *getRandomNumbersThatAddUpTo100() {
@@ -241,12 +255,12 @@ int *getRandomNumbersThatAddUpTo100() {
 
 void askTheAudience() {
     int *arr = getRandomNumbersThatAddUpTo100();
-    printf("------------------------------------------------------\n");
-    printf("A) %d%%\n", arr[0]);
-    printf("B) %d%%\n", arr[1]);
-    printf("C) %d%%\n", arr[2]);
-    printf("D) %d%%\n", arr[3]);
-    printf("------------------------------------------------------\n");
+    m_printf("------------------------------------------------------\n");
+    m_printf("A) %d%%\n", arr[0]);
+    m_printf("B) %d%%\n", arr[1]);
+    m_printf("C) %d%%\n", arr[2]);
+    m_printf("D) %d%%\n", arr[3]);
+    m_printf("------------------------------------------------------\n");
 }
 
 int getPlayerIndexByUsername(Player *players, int size, char *username) {
@@ -259,13 +273,19 @@ int getPlayerIndexByUsername(Player *players, int size, char *username) {
 }
 
 void printPlayerScore(Player player) {
-    printf("Your previous score was: %s", &player.score);
+    m_printf("Your previous score was: %s", &player.score);
 }
 
-//function that adds new Player to the array
-void addNewPlayerToList(Player *players, int *size, Player player) {
+void addNewPlayerToList(Player **players, int *size, Player player) {
     *size += 1;
-    players[*size] = player;
+    *players = (Player *) realloc(*players, sizeof(Player) * (*size));
+    (*players)[*size - 1] = player;
+}
+
+void printPlayers(Player *players, int size) {
+    for (int i = 0; i < size; i++) {
+        m_printf("%s\n", players[i].username);
+    }
 }
 
 int main() {
@@ -273,10 +293,11 @@ int main() {
     int numberOfLevel1Questions;
     int numberOfLevel2Questions;
     int numberOfLevel3Questions;
-    int numberOfPlayers;
+    int numberOfPlayers = 0;
     int playerIndexInList;
     Question *questions = getAllQuestions(&numberOfQuestions);
     int answerIndexes[] = {0, 1, 2, 3};
+    players_file = fopen("players.txt", "a+");
     Player *players = getAllPlayers(&numberOfPlayers);
 
     Question *questionsLevel1 = getAllQuestionsForLevel(questions, numberOfQuestions, 1, &numberOfLevel1Questions);
@@ -288,52 +309,53 @@ int main() {
     int jokerAudience = 1;
     int jokerChangeQuestion = 1; // after level 1
 
-    printf("Welcome to Millionaire!\n");
-    printf("Are you a new player? (Y/N)\n");
+    m_printf("Welcome to Millionaire!\n");
+    m_printf("Are you a new player? (Y/N)\n");
+    fflush(stdout);
     char newPlayer;
     char username[100];
     scanf("%c", &newPlayer);
     Player player;
     if (newPlayer == 'Y' || newPlayer == 'y') {
-        printf("Welcome new player!\n");
-        printf("Please enter the username you will be using:\n");
+        m_printf("Welcome new player!\n");
+        m_printf("Please enter the username you will be using:\n");
         scanf("%s", &username);
         playerIndexInList = getPlayerIndexByUsername(players, numberOfPlayers, username);
         if (playerIndexInList == -1) {
             strcpy(player.username, username);
-            printf("Welcome %s!\n", &player.username);
+            m_printf("Welcome %s!\n", &player.username);
         } else {
             player = players[playerIndexInList];
-            printf("Player already exists!\nWill continue game with player %s\n.", &player.username);
+            m_printf("Player already exists!\nWill continue game with player %s.\n", &player.username);
             printPlayerScore(player);
         }
     } else if (newPlayer == 'N' || newPlayer == 'n') {
-        printf("Please enter your username:\n");
+        m_printf("Please enter your username:\n");
         scanf("%s", &username);
         playerIndexInList = getPlayerIndexByUsername(players, numberOfPlayers, username);
         if (playerIndexInList == -1) {
-            printf("User with username %s not found\n", &username);
+            m_printf("User with username %s not found\n", &username);
             strcpy(player.username, username);
-            printf("Player doesn't exist!\nWill continue game as new player %s.\n", &player.username);
-            printf("Welcome %s!\n", &player.username);
+            m_printf("Player doesn't exist!\nWill continue game as new player %s.\n", &player.username);
+            m_printf("Welcome %s!\n", &player.username);
         } else {
             player = players[playerIndexInList];
-            printf("Welcome back %s!\n", &player.username);
+            m_printf("Welcome back %s!\n", &player.username);
             printPlayerScore(player);
         }
     } else {
-        printf("Unknown command\n Please try again...\n");
+        m_printf("Unknown command\n Please try again...\n");
         return -1;
     }
 
     char *scores = getScoreLevelValues();
+    char currentScore[100];
+    char guaranteedScore[100]; //TODO implement logic for guaranteed score
+    strcpy(guaranteedScore, "0€");
     for (int i = 0; i < 12; ++i) {
-        char currentScore[100];
-        char guaranteedScore[100]; //TODO implement logic for guaranteed score
-        strcpy(guaranteedScore, "0€");
         Question question;
         strcpy(currentScore, &scores[i * 50]);
-        printf("Question number %d for %s\n", i + 1, currentScore);
+        m_printf("Question number %d for %s\n", i + 1, currentScore);
         if (i < 5) {
             question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
             removeItemFromArray(questionsLevel1, numberOfLevel1Questions,
@@ -350,32 +372,32 @@ int main() {
                                 getIndexOfQuestionInArray(questionsLevel3, numberOfLevel3Questions, question));
             numberOfLevel3Questions--;
         }
-        printf("%s", question.questionText);
+        m_printf("%s", question.questionText);
         char correctAnswer[100];
         strcpy(correctAnswer, question.answers[question.correctAnswerIndex]);
         shuffle(answerIndexes, 4);
-        printf("A) %s\n", question.answers[answerIndexes[0]]);
-        printf("B) %s\n", question.answers[answerIndexes[1]]);
-        printf("C) %s\n", question.answers[answerIndexes[2]]);
-        printf("D) %s\n", question.answers[answerIndexes[3]]);
-        printf("\n");
-        printf("Would you like to use a joker? (Y/N)\n");
+        m_printf("A) %s\n", question.answers[answerIndexes[0]]);
+        m_printf("B) %s\n", question.answers[answerIndexes[1]]);
+        m_printf("C) %s\n", question.answers[answerIndexes[2]]);
+        m_printf("D) %s\n", question.answers[answerIndexes[3]]);
+        m_printf("\n");
+        m_printf("Would you like to use a joker? (Y/N)\n");
         char useJoker;
         scanf("%c", &useJoker);
         scanf("%c", &useJoker);
         if (useJoker == 'Y' || useJoker == 'y') {
-            printf("Which joker would you like to use?\n");
+            m_printf("Which joker would you like to use?\n");
             if (jokerFriend == 1) {
-                printf("1. Phone a Friend\n");
+                m_printf("1. Phone a Friend\n");
             }
             if (jokerFiftyFifty == 1) {
-                printf("2. Fifty-Fifty\n");
+                m_printf("2. Fifty-Fifty\n");
             }
             if (jokerAudience == 1) {
-                printf("3. Ask the Audience\n");
+                m_printf("3. Ask the Audience\n");
             }
             if (i >= 5 && jokerChangeQuestion == 1) {
-                printf("4. Change the Question\n");
+                m_printf("4. Change the Question\n");
             }
             char joker;
             while (getchar() != '\n');
@@ -384,84 +406,91 @@ int main() {
                 case '1':
                     if (jokerFriend == 1) {
                         phoneFriendJoker();
-                        printf("You have used the Phone a friend joker!\n");
+                        m_printf("You have used the Phone a friend joker!\n");
                         jokerFriend = 0;
                     } else {
-                        printf("You have already used the Phone a friend joker!\n");
+                        m_printf("You have already used the Phone a friend joker!\n");
                     }
                     break;
                 case '2':
                     if (jokerFiftyFifty == 1) {
                         // TODO: implement logic for fifty-fifty joker
-                        printf("You have used the Fifty-fifty joker!\n");
+                        m_printf("You have used the Fifty-fifty joker!\n");
                         jokerFiftyFifty = 0;
                     } else {
-                        printf("You have already used the Fifty-fifty joker!!\n");
+                        m_printf("You have already used the Fifty-fifty joker!!\n");
                     }
                     break;
                 case '3':
                     if (jokerAudience == 1) {
                         askTheAudience();
-                        printf("You have used the Ask the Audience joker!\n");
+                        m_printf("You have used the Ask the Audience joker!\n");
                         jokerAudience = 0;
                     } else {
-                        printf("You have already used the Ask the Audience joker!\n");
+                        m_printf("You have already used the Ask the Audience joker!\n");
                     }
                     break;
                 case '4':
                     if (jokerChangeQuestion == 1) {
                         // TODO: implement logic for change question joker
-                        printf("You have used your change question joker!\n");
+                        m_printf("You have used your change question joker!\n");
                         jokerChangeQuestion = 0;
                     } else {
-                        printf("You have already used your change question joker!\n");
+                        m_printf("You have already used your change question joker!\n");
                     }
                     break;
                 default:
-                    printf("Unknown command...\n");
+                    m_printf("Unknown command...\n");
                     return -1;
             }
         }
-        printf("Final answer? (A, B, C, D)\n");
+        m_printf("Final answer? (A, B, C, D)\n");
         //TODO implement logic to give player chance to give up and walk away with the current score
         char playerAnswerLetter;
         while (getchar() != '\n');
         scanf("%c", &playerAnswerLetter);
         char playerAnswer[100];
         strcpy(playerAnswer, question.answers[answerIndexes[getArrayIndexFromAnswerLetter(playerAnswerLetter)]]);
-        printf("-----------------------------------------------------\n");
+        m_printf("-----------------------------------------------------\n");
         if (strcmp(playerAnswer, correctAnswer) == 0) {
-            printf("Your final answer for %s was correct!\n", currentScore);
+            m_printf("Your final answer for %s was correct!\n", currentScore);
             if (i == 4 || i == 8) {
-                printf("You have achieved a guaranteed value!\n");
+                m_printf("You have achieved a guaranteed value!\n");
                 strcpy(guaranteedScore, currentScore);
             } else if (i == 11) {
-                printf("You have won one million euros!\n");
+                m_printf("You have won one million euros!\n");
 //                TODO implement writing user to file and end game
                 strcpy(player.score, currentScore);
                 if (playerIndexInList == -1) {
-                    addNewPlayerToList(players, &numberOfPlayers, player);
+                    addNewPlayerToList(&players, &numberOfPlayers, player);
+                } else {
+                    strcpy(players[playerIndexInList].score, guaranteedScore);
                 }
-                writePlayersToFile(&player, numberOfPlayers);
+                writePlayersToFile(players, numberOfPlayers);
             }
         } else {
-            printf("Your final answer for %s was incorrect!\n", currentScore);
-            printf("Your answer was %s\n", playerAnswer);
-            printf("The correct answer was %s\n", correctAnswer);
+            m_printf("Your final answer for %s was incorrect!\n", currentScore);
+            m_printf("Your answer was %s\n", playerAnswer);
+            m_printf("The correct answer was %s\n", correctAnswer);
 
 //            TODO: add case if player decides to walk away with current score
-            printf("You have earned a guaranteed sum of  %s\n", guaranteedScore);
+            m_printf("You have earned a guaranteed sum of %s\n", guaranteedScore);
             strcpy(player.score, guaranteedScore);
             if (playerIndexInList == -1) {
-                addNewPlayerToList(players, &numberOfPlayers, player);
+                addNewPlayerToList(&players, &numberOfPlayers, player);
+//                printPlayers(players, numberOfPlayers);
+            } else {
+                strcpy(players[playerIndexInList].score, guaranteedScore);
             }
-            writePlayersToFile(&player, numberOfPlayers);
+            writePlayersToFile(players, numberOfPlayers);
             break;
         }
 
 
 //        todo: finish the rest of answering logic and save the score to file
     }
+    fflush(players_file);
+    fclose(players_file);
 
     return 0;
 }
