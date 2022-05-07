@@ -254,8 +254,32 @@ void askTheAudienceJoker() {
     m_printf("------------------------------------------------------\n");
 }
 
-void changeTheQuestionJoker() {
+int getIndexOfCorrectAnswer(char correctAnswer[], Question *question, const int answerIndexes[]) {
+    for (int i = 0; i < 4; i++) {
+        if (strcmp(correctAnswer, question->answers[answerIndexes[i]]) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
 
+void fiftyFiftyJoker(char correctAnswer[], Question *question, int answerIndexes[]) {
+    int index = getIndexOfCorrectAnswer(correctAnswer, question, answerIndexes);
+    if (index == 0 || index == 2) {
+        m_printf("------------------------------------------------------\n");
+        m_printf("A) %s", question->answers[answerIndexes[0]]);
+        m_printf("B) \n");
+        m_printf("C) %s", question->answers[answerIndexes[2]]);
+        m_printf("D) \n");
+        m_printf("------------------------------------------------------\n");
+    } else if (index == 1 || index == 3) {
+        m_printf("------------------------------------------------------\n");
+        m_printf("A) \n");
+        m_printf("B) %s", question->answers[answerIndexes[1]]);
+        m_printf("C) \n");
+        m_printf("D) %s", question->answers[answerIndexes[3]]);
+        m_printf("------------------------------------------------------\n");
+    }
 }
 
 int getPlayerIndexByUsername(Player *players, int size, char *username) {
@@ -418,7 +442,7 @@ int main() {
                 if (jokerAudience == 1) {
                     m_printf("3. Ask the Audience\n");
                 }
-                if (i >= 5 && jokerChangeQuestion == 1) {
+                if (i >= 4 && jokerChangeQuestion == 1) {
                     m_printf("4. Change the Question\n");
                 }
                 char joker;
@@ -427,8 +451,9 @@ int main() {
                 switch (joker) {
                     case '1':
                         if (jokerFriend == 1) {
-                            phoneFriendJoker();
+                            m_printf("\n");
                             m_printf("You have used the Phone a friend joker!\n");
+                            phoneFriendJoker();
                             jokerFriend = 0;
                         } else {
                             m_printf("You have already used the Phone a friend joker!\n");
@@ -436,8 +461,9 @@ int main() {
                         break;
                     case '2':
                         if (jokerFiftyFifty == 1) {
-                            // TODO: implement logic for fifty-fifty joker
+                            m_printf("\n");
                             m_printf("You have used the Fifty-fifty joker!\n");
+                            fiftyFiftyJoker(correctAnswer, &question, answerIndexes);
                             jokerFiftyFifty = 0;
                         } else {
                             m_printf("You have already used the Fifty-fifty joker!!\n");
@@ -445,8 +471,8 @@ int main() {
                         break;
                     case '3':
                         if (jokerAudience == 1) {
-                            askTheAudienceJoker();
                             m_printf("You have used the Ask the Audience joker!\n");
+                            askTheAudienceJoker();
                             jokerAudience = 0;
                         } else {
                             m_printf("You have already used the Ask the Audience joker!\n");
