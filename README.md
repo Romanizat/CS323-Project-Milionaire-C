@@ -49,13 +49,13 @@ If a player decides to give up, he can leave with the curren amount before answe
 The achieved result is written to the file.
 
 
-###*Gameplay Instructions:*
+### *Gameplay Instructions:*
 
 ---
 
 [//]: # (TODO)
 
-###*Build Instructions:*
+### *Build Instructions:*
 
 ---
 
@@ -64,7 +64,7 @@ The achieved result is written to the file.
   which is located in this project.
 
 
-##***Disclaimer***
+## ***Disclaimer***
 
 ---
 
