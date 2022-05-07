@@ -161,7 +161,6 @@ int getIndexOfQuestionInArray(Question *questions, int size, Question question) 
     return -1;
 }
 
-
 void shuffle(int *array, size_t n) {
     srand(time(NULL));
     if (n > 1) {
@@ -174,7 +173,6 @@ void shuffle(int *array, size_t n) {
         }
     }
 }
-
 
 int getArrayIndexFromAnswerLetter(char letter) {
     switch (letter) {
@@ -246,7 +244,7 @@ int *getRandomNumbersThatAddUpTo100() {
     return numbers;
 }
 
-void askTheAudience() {
+void askTheAudienceJoker() {
     int *arr = getRandomNumbersThatAddUpTo100();
     m_printf("------------------------------------------------------\n");
     m_printf("A) %d%%\n", arr[0]);
@@ -254,6 +252,10 @@ void askTheAudience() {
     m_printf("C) %d%%\n", arr[2]);
     m_printf("D) %d%%\n", arr[3]);
     m_printf("------------------------------------------------------\n");
+}
+
+void changeTheQuestionJoker() {
+
 }
 
 int getPlayerIndexByUsername(Player *players, int size, char *username) {
@@ -352,7 +354,18 @@ int main() {
         return -1;
     }
 
+    m_printf("\n");
+    m_printf("           _ _ _ _                   _          \n"
+             "          (_) | (_)                 (_)         \n"
+             " _ __ ___  _| | |_  ___  _ __   __ _ _ _ __ ___ \n"
+             "| '_ ` _ \\| | | | |/ _ \\| '_ \\ / _` | | '__/ _ \\\n"
+             "| | | | | | | | | | (_) | | | | (_| | | | |  __/\n"
+             "|_| |_| |_|_|_|_|_|\\___/|_| |_|\\__,_|_|_|  \\___|\n");
+    m_printf("\n");
+
+    m_printf("-----------------------------------------------------\n");
     m_printf("To quit and walk away with the current score enter Q when answering the question\n");
+    m_printf("-----------------------------------------------------\n");
     char *scores = getScoreLevelValues();
     char currentQuestionScore[100];
     char currentScore[100];
@@ -363,6 +376,7 @@ int main() {
         Question question;
         strcpy(currentQuestionScore, &scores[i * 50]);
         m_printf("Question number %d for %s\n", i + 1, currentQuestionScore);
+        getQuestionLabel:
         if (i < 5) {
             question = getRandomQuestionForLevel(questionsLevel1, numberOfLevel1Questions);
             removeItemFromArray(questionsLevel1, numberOfLevel1Questions,
@@ -431,7 +445,7 @@ int main() {
                         break;
                     case '3':
                         if (jokerAudience == 1) {
-                            askTheAudience();
+                            askTheAudienceJoker();
                             m_printf("You have used the Ask the Audience joker!\n");
                             jokerAudience = 0;
                         } else {
@@ -440,9 +454,9 @@ int main() {
                         break;
                     case '4':
                         if (jokerChangeQuestion == 1) {
-                            // TODO: implement logic for change question joker
                             m_printf("You have used your change question joker!\n");
                             jokerChangeQuestion = 0;
+                            goto getQuestionLabel;
                         } else {
                             m_printf("You have already used your change question joker!\n");
                         }
@@ -475,6 +489,7 @@ int main() {
         m_printf("-----------------------------------------------------\n");
         if (strcmp(playerAnswer, correctAnswer) == 0) {
             m_printf("Your final answer for %s was correct!\n", currentQuestionScore);
+            m_printf("\n");
             strcpy(currentScore, currentQuestionScore);
             if (i == 4 || i == 8) {
                 m_printf("You have achieved a guaranteed value!\n");
@@ -491,13 +506,13 @@ int main() {
             }
         } else {
             m_printf("Your final answer for %s was incorrect!\n", currentQuestionScore);
+            m_printf("\n");
             m_printf("Your answer was %s\n", playerAnswer);
             m_printf("The correct answer was %s\n", correctAnswer);
             m_printf("You have earned a guaranteed sum of %s\n", guaranteedScore);
             strcpy(player.score, guaranteedScore);
             if (playerIndexInList == -1) {
                 addNewPlayerToList(&players, &numberOfPlayers, player);
-//                printPlayers(players, numberOfPlayers);
             } else {
                 strcpy(players[playerIndexInList].score, guaranteedScore);
             }
